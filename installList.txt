@@ -1,0 +1,7 @@
+When reinstalling for the class you'll need:
+- LaTeX: https://www.latex-project.org/get/
+- Pandoc: https://pandoc.org/installing.html
+- Python 3.11: https://www.python.org/downloads/
+
+Dependencies:
+numpy scipy matplotlib nbconvert ipykernel otter-grader imageio pyyaml
