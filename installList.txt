@@ -5,3 +5,10 @@ When reinstalling for the class you'll need:
 
 Dependencies:
 numpy scipy matplotlib nbconvert ipykernel otter-grader imageio pyyaml
+
+
+updating from the class repo:
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
