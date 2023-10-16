@@ -22,7 +22,9 @@ class RobotSensors:
         #  TODO: Add another dictionary for the distance to the wall sensor noise
         # Note: The actual values in the dictionaries will be set in the calls to set_* below
         # Second note: all variables should be referenced with self. or they will disappear
-# YOUR CODE HERE
+
+        #code
+        self.door_values = {"door": {}, "no_door": {}}  # Bayes filter
 
         # In the GUI version, these will be called with values from the GUI after the RobotSensors instance
         #   has been created
@@ -39,7 +41,10 @@ class RobotSensors:
         # TODO: Store the input values in TWO dictionaries (one for the door there, one for no door)
         #  Reminder: You should have created the dictionary to hold the dictionaries in the __init__ method above
         #  Second note: all variables should be referenced with self.
-# YOUR CODE HERE
+
+        #code
+        self.door_values["door"] = {"prob_see_door_if_door": in_prob_see_door_if_door}
+        self.door_values["no_door"] = {"prob_see_door_if_not_door": in_prob_see_door_if_not_door}
 
     def set_distance_wall_sensor_probabilities(self, sigma=0.1):
         """ Setup the wall sensor probabilities (store them in the dictionary)
@@ -70,7 +75,20 @@ class RobotSensors:
         # STEP 1 - generate a random number between 0 and 1
         # STEP 2 - use the random number (and your first if statement) to determine if you should return True or False
         # Note: This is just the sample_boolean code from your probabilities assignment
-# YOUR CODE HERE
+
+        #code
+        zero_to_one = np.random.uniform()
+        if is_in_front_of_door:
+            if zero_to_one < self.door_values["door"]["prob_see_door_if_door"]:
+                return True
+            else:
+                return False
+        else:
+            if zero_to_one < self.door_values["no_door"]["prob_see_door_if_not_door"]:
+                return True
+            else:
+                return False
+
 
     def query_distance_to_wall(self, robot_gt):
         """ Return a distance reading (with correct noise) of the robot's location
