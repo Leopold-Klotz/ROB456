@@ -24,7 +24,7 @@ class RobotSensors:
         # Second note: all variables should be referenced with self. or they will disappear
 
         #code
-        self.door_values = {"door": {}, "no_door": {}}  # Bayes filter
+        self.sensor_probabilities = {"door": {}, "no_door": {}}  # Bayes filter
 
         # In the GUI version, these will be called with values from the GUI after the RobotSensors instance
         #   has been created
@@ -43,8 +43,8 @@ class RobotSensors:
         #  Second note: all variables should be referenced with self.
 
         #code
-        self.door_values["door"] = {"prob_see_door_if_door": in_prob_see_door_if_door}
-        self.door_values["no_door"] = {"prob_see_door_if_not_door": in_prob_see_door_if_not_door}
+        self.sensor_probabilities["door"] = {"prob_see_door_if_door": in_prob_see_door_if_door}
+        self.sensor_probabilities["no_door"] = {"prob_see_door_if_not_door": in_prob_see_door_if_not_door}
 
     def set_distance_wall_sensor_probabilities(self, sigma=0.1):
         """ Setup the wall sensor probabilities (store them in the dictionary)
@@ -79,12 +79,12 @@ class RobotSensors:
         #code
         zero_to_one = np.random.uniform()
         if is_in_front_of_door:
-            if zero_to_one < self.door_values["door"]["prob_see_door_if_door"]:
+            if zero_to_one < self.sensor_probabilities["door"]["prob_see_door_if_door"]:
                 return True
             else:
                 return False
         else:
-            if zero_to_one < self.door_values["no_door"]["prob_see_door_if_not_door"]:
+            if zero_to_one < self.sensor_probabilities["no_door"]["prob_see_door_if_not_door"]:
                 return True
             else:
                 return False

@@ -27,7 +27,7 @@ class BayesFilter:
         @param n_bins - the number of bins to divide the unit interval (0,1) up into """
 
         # TODO create an array with n_bins, set to uniform distribution
-# YOUR CODE HERE
+        self.probabilities = np.ones(n_bins) / n_bins 
 
     def update_belief_sensor_reading(self, world_ground_truth, robot_sensor, sensor_reading):
         """ Update your probabilities based on the sensor reading being true (door) or false (no door)
@@ -52,7 +52,32 @@ class BayesFilter:
         #     You'll need to know if the bin is in front of the door or not to compute this
         # You might find enumerate useful
         #  for i, p in enumerate(self.probabilities):
-# YOUR CODE HERE
+
+        #code
+        new_prob = np.zeros(len(self.probabilities))
+        for i, p in enumerate(self.probabilities): # i is the index, p is the value
+            if world_ground_truth.is_location_in_front_of_door((i+0.5)/len(self.probabilities)):
+                # in front of door
+                if sensor_reading:
+                    # sensor reading is true
+                    new_prob[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * p # p(y|x) * p(x) where y is true and x is in front of door
+                else:
+                    # sensor reading is false
+                    new_prob[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * p # p(y|x) * p(x) where y is false and x is in front of door
+
+            else:
+                # not in front of door
+                if sensor_reading:
+                    # sensor reading is true
+                    new_prob[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * p # p(y|x) * p(x) where y is true and x is not in front of door
+                else:
+                    # sensor reading is false
+                    new_prob[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * p # p(y|x) * p(x) where y is false and x is not in front of door
+
+        # normalize
+        self.probabilities = new_prob / np.sum(new_prob)
+
+
 
     def update_belief_move_left(self, robot_ground_truth):
         """ Update the probabilities assuming a move left.
@@ -69,7 +94,11 @@ class BayesFilter:
         # Don't forget to normalize - but if you've done this correctly then the sum should be very, very close to
         #  one already - any error is just numerical
 
-# YOUR CODE HERE
+        #code
+        new_prob = np.zeros(len(self.probabilities))
+        for i, p in enumerate(self.probabilities):
+            for j, pr in enumerate(self.probabilities):
+                new_prob[i] += robot_ground_truth.move_probabilities["move_left"][i][j] * pr
 
     def update_belief_move_right(self, robot_ground_truth):
         """ Update the probabilities assuming a move right.
