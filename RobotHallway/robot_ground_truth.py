@@ -62,7 +62,10 @@ class RobotGroundTruth:
         #     Yes, you can store dictionaries in dictionaries
         # Check that the probabilities sum to one and are between 0 and 1
 
-# YOUR CODE HERE
+        # code
+        self.move_probabilities["move_left"] = {"left": move_left, "right": move_right, "stay": 1 - move_left - move_right}
+        # print("Moving left probabilities: ", self.move_probabilities["move_left"])
+        # print(sum(self.move_probabilities["move_left"].values()))  
 
     def set_move_right_probabilities(self, move_left=0.05, move_right=0.8):
         """ Set the three discrete probabilities for moving right (should sum to one and all be positive)
@@ -75,7 +78,10 @@ class RobotGroundTruth:
         #     Yes, you can store dictionaries in dictionaries
         # Check that the probabilities sum to one and are between 0 and 1
 
-# YOUR CODE HERE
+        # code
+        self.move_probabilities["move_right"] = {"left": move_left, "right": move_right, "stay": 1 - move_left - move_right}
+        # print("Moving right probabilities: ", self.move_probabilities["move_right"])
+        # print(sum(self.move_probabilities["move_right"].values()))
 
     def set_move_continuos_probabilities(self, sigma=0.1):
         """ Set the noise for continuous movement
@@ -135,7 +141,14 @@ class RobotGroundTruth:
         #  Set step_dir to -1 (left), 0 (stay put) or 1 (right) based on sampling the move_left variable
         step_dir = 0
 
-# YOUR CODE HERE
+        # code
+        zero_to_one = np.random.uniform()
+        counter = 0
+        for key, value in self.move_probabilities["move_left"].items():
+            counter += value
+            if zero_to_one < counter:
+                step_dir = -1 if key == "left" else 0 if key == "stay" else 1
+                break
 
         # This returns the actual move amount, clamped to 0, 1
         #   i.e., don't run off the end of the hallway
@@ -150,7 +163,14 @@ class RobotGroundTruth:
         # Set step_dir to -1 (left), 0 (stay put) or 1 (right) based on sampling the move_right variable
         step_dir = 0
 
-# YOUR CODE HERE
+        # code
+        zero_to_one = np.random.uniform()
+        counter = 0
+        for key, value in self.move_probabilities["move_right"].items():
+            counter += value
+            if zero_to_one < counter:
+                step_dir = -1 if key == "left" else 0 if key == "stay" else 1
+                break
 
         return self._move_clamped_discrete(step_dir * step_size)
 
