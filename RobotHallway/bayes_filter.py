@@ -95,6 +95,7 @@ class BayesFilter:
         #  one already - any error is just numerical
 
         #code
+
         new_prob = np.zeros(len(self.probabilities))
         for i, p in enumerate(self.probabilities):
             for j, pr in enumerate(self.probabilities):
