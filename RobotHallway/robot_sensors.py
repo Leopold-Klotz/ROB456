@@ -43,8 +43,8 @@ class RobotSensors:
         #  Second note: all variables should be referenced with self.
 
         #code
-        self.sensor_probabilities["door"] = {"prob_see_door_if_door": in_prob_see_door_if_door}
-        self.sensor_probabilities["no_door"] = {"prob_see_door_if_not_door": in_prob_see_door_if_not_door}
+        self.sensor_probabilities["door"] = {"prob_see_door_if_door": in_prob_see_door_if_door, "if_door_see_no_door": (1-in_prob_see_door_if_door)}
+        self.sensor_probabilities["no_door"] = {"prob_see_door_if_not_door": in_prob_see_door_if_not_door, "if_not_door_see_door": (1-in_prob_see_door_if_not_door)}
 
     def set_distance_wall_sensor_probabilities(self, sigma=0.1):
         """ Setup the wall sensor probabilities (store them in the dictionary)
