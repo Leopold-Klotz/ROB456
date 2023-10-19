@@ -36,7 +36,25 @@ class KalmanFilter:
         @param dist_reading - distance reading returned by sensor"""
 
         # TODO: Calculate C and K, then update self.mu and self.sigma
-# YOUR CODE HERE
+        
+        #code
+        # I think C is just 1 because it is an identity matrix
+        C = 1
+
+        # kalman gain = error in estimate / (error in estimate + error in sensor) https://medium.com/@jaems33/understanding-kalman-filters-with-python-2310e87b8f48
+        K = self.sigma / (self.sigma + robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"])
+        # K should be between 0 and 1
+        if (K<1) and (K>0):
+            print("K is between 0 and 1")
+        else:
+            print("Something is wrong with K")
+
+        # update mu (update of state) = previous state + kalman gain * (measurement - previous state)
+        self.mu = self.mu + K * (dist_reading - self.mu)
+
+        # update sigma (update of uncertainty) = (1 - kalman gain) * previous uncertainty
+        self.sigma = (1 - K) * self.sigma         
+
         return self.mu, self.sigma
 
     # Given a movement, update Gaussian
@@ -83,7 +101,7 @@ def test_kalman_update(b_print=True):
         print("Testing Kalman")
     # Generate some move sequences and compare to the correct answer
     import json
-    with open("Data/check_kalman_filter.json", "r") as f:
+    with open("/Users/leo_k/My Drive/Fall 2023/Robotics/ROB456/RobotHallway/Data/check_kalman_filter.json", "r") as f:
         answers = json.load(f)
 
     kalman_filter = KalmanFilter()

@@ -24,7 +24,7 @@ class RobotSensors:
         # Second note: all variables should be referenced with self. or they will disappear
 
         #code
-        self.sensor_probabilities = {"door": {}, "no_door": {}}  # Bayes filter
+        self.sensor_probabilities = {"door": {}, "no_door": {}, "dist_to_wall_noise": {}}  # Bayes filter + kalman filter
 
         # In the GUI version, these will be called with values from the GUI after the RobotSensors instance
         #   has been created
@@ -53,7 +53,9 @@ class RobotSensors:
 
         # Kalman assignment
         # TODO: Store the mean and standard deviation
-# YOUR CODE HERE
+
+        #code
+        self.sensor_probabilities["dist_to_wall_noise"] = {"mean": 0, "sigma": sigma}
 
     def query_door(self, robot_gt, world_gt):
         """ Query the door sensor
@@ -100,7 +102,10 @@ class RobotSensors:
         # Kalman assignment
         # TODO: Return the distance to the wall (with noise)
         #  This is the Gaussian assignment from your probabilities homework
-# YOUR CODE HERE
+
+        #code
+        return robot_gt.robot_loc + np.random.normal(self.sensor_probabilities["dist_to_wall_noise"]["mean"], self.sensor_probabilities["dist_to_wall_noise"]["sigma"])
+
 
 
 def test_discrete_sensors(b_print=True):

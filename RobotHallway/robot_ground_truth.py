@@ -93,7 +93,10 @@ class RobotGroundTruth:
         #   Set self.move_probabilities["move_continuous"] = {...} to be a dictionary with the above probabilities
         # Check that sigma is positive
 
-# YOUR CODE HERE
+        if sigma >= 0: # possibly should be only >
+            self.move_probabilities["move_continuous"] = {"mean": 0, "sigma": sigma}
+
+
 
     # Just a helper function to place robot in middle of bin
     def _adjust_middle_of_bin(self, n_divs):
@@ -183,7 +186,9 @@ class RobotGroundTruth:
         # Set noisy_amount to be the amount to move, plus noise
         noisy_amount = amount
 
-# YOUR CODE HERE
+        #code
+        # random.normal(mean, sigma) samples the gaussian. adds noise to the movement
+        noisy_amount += np.random.normal(self.move_probabilities["move_continuous"]["mean"], self.move_probabilities["move_continuous"]["sigma"]) 
 
         # Actually move (don't run off of end)
         return self._move_clamped_continuous(noisy_amount)
