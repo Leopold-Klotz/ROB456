@@ -95,6 +95,8 @@ class RobotGroundTruth:
 
         if sigma >= 0: # possibly should be only >
             self.move_probabilities["move_continuous"] = {"mean": 0, "sigma": sigma}
+        else:
+            print ("ERROR")
 
 
 

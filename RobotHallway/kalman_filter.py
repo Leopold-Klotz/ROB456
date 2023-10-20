@@ -38,22 +38,22 @@ class KalmanFilter:
         # TODO: Calculate C and K, then update self.mu and self.sigma
         
         #code
-        # I think C is just 1 because it is an identity matrix
+        # C aims to be the identity matrix. In this problem context C is 1
         C = 1
 
         # kalman gain = error in estimate / (error in estimate + error in sensor) https://medium.com/@jaems33/understanding-kalman-filters-with-python-2310e87b8f48
-        K = self.sigma / (self.sigma + robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"])
+        K = (self.sigma * C)/ ((C * self.sigma * C) + robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"])
         # K should be between 0 and 1
-        if (K<1) and (K>0):
-            print("K is between 0 and 1")
-        else:
-            print("Something is wrong with K")
+        # if (K<1) and (K>0):
+        #     print("K is between 0 and 1")
+        # else:
+        #     print("Something is wrong with K")
 
         # update mu (update of state) = previous state + kalman gain * (measurement - previous state)
-        self.mu = self.mu + K * (dist_reading - self.mu)
+        self.mu = self.mu + K * (dist_reading - (C * self.mu))
 
         # update sigma (update of uncertainty) = (1 - kalman gain) * previous uncertainty
-        self.sigma = (1 - K) * self.sigma         
+        self.sigma = (1 - K * C) * self.sigma         
 
         return self.mu, self.sigma
 
@@ -68,7 +68,22 @@ class KalmanFilter:
         @return : mu and sigma of new current estimated location """
 
         # TODO: Update mu and sigma by Ax + Bu equation
-# YOUR CODE HERE
+        
+        #code
+        # A is how the previous location (state) gets changed over time step t
+        # Generally this will be one or the identity matrix unless there is some world state changing the robot (i.e. on a treadmill moving the robot back)
+        A = 1
+        # B is the matrix that maps input signal to final movement. If moving in coordinate plane with 0 degree heading, the matrix will be [[1,0] [0,1]] (identity)
+        # because x and y coordinates get mapped to their corresponding inputs. If at a heading, this matrix will be whatever translates the input to a 
+        # position at that heading. 
+        B = 1
+
+        # mean = A (mean t-1) + B (movement signal) + mu of robot ground truth
+        self.mu = A * self.mu + B * amount + robot_ground_truth.move_probabilities["move_continuous"]["mean"]
+        #sigma = A * (sigma t-1) * A^T + noise from robot ground truth
+        self.sigma = A * self.sigma + robot_ground_truth.move_probabilities["move_continuous"]["sigma"]
+
+
         return self.mu, self.sigma
 
     def one_full_update(self, robot_ground_truth, robot_sensor, u: float, z: float):
@@ -86,8 +101,10 @@ class KalmanFilter:
         # TODO:
         #  Step 1 predict: update your belief by the action (move the Gaussian)
         #  Step 2 correct: do the correction step (move the Gaussian to be between the current mean and the sensor reading)
-# YOUR CODE HERE
 
+        #code
+        self.update_continuous_move(robot_ground_truth, u)
+        self.update_belief_distance_sensor(robot_sensor, z)
 
 
 
