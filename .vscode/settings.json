@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/leo_k/My Drive/Fall 2023/Robotics/ROB456/Shell_code_ROS/src/lab0"
+    "cmake.sourceDirectory": "/Users/leo_k/My Drive/Fall 2023/Robotics/ROB456/Shell_code_ROS/src/lab0",
+    "cmake.configureOnOpen": false
 }
