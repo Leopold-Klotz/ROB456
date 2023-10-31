@@ -91,23 +91,27 @@ class ParticleFilter:
 
         for i, p in enumerate(self.particles):
             # set the weight to the probability of the sensor reading given the location
+
+            # should p(x) be 1? since it's at the location? or p? should be the probability of being in front of the door... which is ... maybe 1 if door is there 0 if not based on world ground truth?
+            UNSURE = 1 # unsure what p(x) should be. I think p(x) is 1 because there is no prior probability of being at a location. -> particles were uniformly distributed and normalized at end of function
+
             if world_ground_truth.is_location_in_front_of_door(p):
                 # in front of door
                 if sensor_reading:
                     # sensor reading is true
-                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * 1# p(y|x) * p(x) where y is true and x is in front of door
+                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * UNSURE# p(y|x) * p(x) where y is true and x is in front of door
                 else:
                     # sensor reading is false
-                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["if_door_see_no_door"] * 1 # p(x) is the probability of being at the point x for this sample. 
+                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["if_door_see_no_door"] * UNSURE # p(x) is the probability of being at the point x for this sample. 
 
             else:
                 # not in front of door
                 if sensor_reading:
                     # sensor reading is true
-                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * 1 # p(y|x) * p(x) where y is true and x is not in front of door
+                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * UNSURE # p(y|x) * p(x) where y is true and x is not in front of door
                 else:
                     # sensor reading is false
-                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["if_not_door_see_door"] * 1
+                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["if_not_door_see_door"] * UNSURE
 
         # normalize
         self.weights = self.weights / np.sum(self.weights)
