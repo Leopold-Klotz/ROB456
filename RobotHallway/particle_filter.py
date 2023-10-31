@@ -29,7 +29,7 @@ class ParticleFilter:
         # TODO
         #  Step 1: create n_samples of the state space, uniformly distributed
         #  Step 2: create n_samples of uniform weights
-        self.particles = np.random.uniform(0.0, 1.0, n_samples)
+        self.particles = np.random.uniform(size = n_samples)
         self.weights = np.ones(n_samples) / n_samples # make the weights uniform
 
     def update_particles_move_continuous(self, robot_ground_truth, amount):
@@ -44,23 +44,34 @@ class ParticleFilter:
         #   For each particle, move it by the given amount PLUS some noise, drawn from the robot_ground_truth_syntax noise model
         #       If you don't add noise, you will quickly have all of the particles at the same location..
         #   If it runs into a wall, offset it from the wall by a random amount
+        new_particles = np.zeros(len(self.particles))
 
         for i, p in enumerate(self.particles):
             # particle = amount + noise from robot ground truth
 
-            # maybe the error is i'm not adding noise?
-
-
-            self.particles[i] = p + amount + np.random.normal(robot_ground_truth.move_probabilities["move_continuous"]["mean"], robot_ground_truth.move_probabilities["move_continuous"]["sigma"])
+            # mean 0 because we don't want to double add the move
+            new_amount = p + np.random.normal(amount, robot_ground_truth.move_probabilities["move_continuous"]["sigma"])
 
             # check if it runs into a wall
-            if self.particles[i] < 0:
+            if new_amount <= 0:
                 # off the left wall
-                self.particles[i] = np.random.uniform(0, robot_ground_truth.move_probabilities["move_continuous"]["sigma"])
+                new_dist =  abs(new_amount) + abs(np.random.normal(0, robot_ground_truth.move_probabilities["move_continuous"]["sigma"]))
+                new_particles[i] = new_dist                
 
-            elif self.particles[i] > 1:
+            elif new_amount >= 1:
                 # off the right wall
-                self.particles[i] = np.random.uniform(1 - robot_ground_truth.move_probabilities["move_continuous"]["sigma"], 1)
+                new_dist = new_amount - 1 + abs(np.random.normal(0, robot_ground_truth.move_probabilities["move_continuous"]["sigma"]))
+                new_particles[i] = 1 - new_dist
+
+            else:
+                # not off a wall
+                new_particles[i] = new_amount
+
+        for i in range(len(new_particles)):
+            if new_particles[i] < 0 or new_particles[i] > 1:
+                print("ERROR: particle is off the wall. value: ", new_particles[i])
+
+        self.particles = new_particles
 
         # print(f"CL {count_off_left_wall} CR {count_off_right_wall}")
 
@@ -141,7 +152,10 @@ class ParticleFilter:
         for i, p in enumerate(self.particles):
             # gaussian returns a probability
             # set the weight to the probability of the sensor reading given the location
-            self.weights[i] = gaussian(dist_reading, p, robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"]) * p
+            self.weights[i] = gaussian(p, dist_reading, robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"]) * 1
+
+        # normalize
+        self.weights = self.weights / np.sum(self.weights)
 
     def resample_particles(self):
         """ Importance sampling - take the current set of particles and weights and make a new set
@@ -162,21 +176,24 @@ class ParticleFilter:
         #         Note that np.where can be used to substantially speed up finding which particle
         #   Part 3: Set the weights back to uniform (just to be neat and clean)
 
-        new_particles = np.zeros(len(self.particles))
-        weights_sum = np.zeros(len(self.weights))
+        # new_particles = np.zeros(len(self.particles))
+        # weights_sum = np.zeros(len(self.weights))
 
-        for i in range(len(self.particles)):
-            weights_sum[i] = np.sum(self.weights[:i+1])
-            rand = np.random.uniform(0, 1)
+        # for i in range(len(self.particles)):
+        #     weights_sum[i] = np.sum(self.weights[:i+1])
+        #     rand = np.random.uniform(0, 1)
 
-            # discrete sampling
-            for j in range(len(weights_sum)): 
-                if weights_sum[j] > rand: 
-                    new_particles[i] = self.particles[j]
-                    break
+        #     # discrete sampling
+        #     for j in range(len(weights_sum)): 
+        #         if weights_sum[j] > rand: 
+        #             new_particles[i] = self.particles[j]
+        #             break
 
-        self.particles = new_particles
-        self.weights = np.ones(len(weights_sum)) / len(weights_sum) # make the weights uniform
+        # self.particles = new_particles
+        # self.weights = np.ones(len(weights_sum)) / len(weights_sum) # make the weights uniform
+
+        self.particles = np.random.choice(self.particles, size=len(self.particles), replace=True, p=self.weights)
+        self.weights = np.ones(len(self.particles)) / len(self.particles) # make the weights uniform
 
 
     def one_full_update_door(self, world_ground_truth, robot_ground_truth, robot_sensor, u: float, z: bool):
