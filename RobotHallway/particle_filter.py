@@ -47,6 +47,10 @@ class ParticleFilter:
 
         for i, p in enumerate(self.particles):
             # particle = amount + noise from robot ground truth
+
+            # maybe the error is i'm not adding noise?
+
+
             self.particles[i] = p + amount + np.random.normal(robot_ground_truth.move_probabilities["move_continuous"]["mean"], robot_ground_truth.move_probabilities["move_continuous"]["sigma"])
 
             # check if it runs into a wall
@@ -91,19 +95,19 @@ class ParticleFilter:
                 # in front of door
                 if sensor_reading:
                     # sensor reading is true
-                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * p # p(y|x) * p(x) where y is true and x is in front of door
+                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["prob_see_door_if_door"] * 1# p(y|x) * p(x) where y is true and x is in front of door
                 else:
                     # sensor reading is false
-                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["if_door_see_no_door"] * p 
+                    self.weights[i] = robot_sensor.sensor_probabilities["door"]["if_door_see_no_door"] * 1 # p(x) is the probability of being at the point x for this sample. 
 
             else:
                 # not in front of door
                 if sensor_reading:
                     # sensor reading is true
-                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * p # p(y|x) * p(x) where y is true and x is not in front of door
+                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["prob_see_door_if_not_door"] * 1 # p(y|x) * p(x) where y is true and x is not in front of door
                 else:
                     # sensor reading is false
-                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["if_not_door_see_door"] * p
+                    self.weights[i] = robot_sensor.sensor_probabilities["no_door"]["if_not_door_see_door"] * 1
 
         # normalize
         self.weights = self.weights / np.sum(self.weights)
@@ -131,6 +135,7 @@ class ParticleFilter:
             return (1.0 / (sigma * np.sqrt(2 * np.pi))) * np.exp(- (x - mu) ** 2 / (2 * sigma ** 2))
 
         for i, p in enumerate(self.particles):
+            # gaussian returns a probability
             # set the weight to the probability of the sensor reading given the location
             self.weights[i] = gaussian(dist_reading, p, robot_sensors.sensor_probabilities["dist_to_wall_noise"]["sigma"]) * p
 
@@ -160,13 +165,14 @@ class ParticleFilter:
             weights_sum[i] = np.sum(self.weights[:i+1])
             rand = np.random.uniform(0, 1)
 
-            for j in range(len(weights_sum)):
-                if weights_sum[j] > rand:
+            # discrete sampling
+            for j in range(len(weights_sum)): 
+                if weights_sum[j] > rand: 
                     new_particles[i] = self.particles[j]
                     break
 
         self.particles = new_particles
-        self.weights = np.ones(len(weights_sum)) / len(weights_sum)
+        self.weights = np.ones(len(weights_sum)) / len(weights_sum) # make the weights uniform
 
 
     def one_full_update_door(self, world_ground_truth, robot_ground_truth, robot_sensor, u: float, z: bool):
@@ -183,7 +189,7 @@ class ParticleFilter:
         @param z will be one of True or False (door y/n)
         """
         # TODO:
-        #  Step 1 Move the particles (with moise added)
+        #  Step 1 Move the particles (with noise added)
         #  Step 2 Calculate the weights using the door sensor return value
         #  Step 3 Resample/importance weight
         
@@ -208,7 +214,7 @@ class ParticleFilter:
         @param z will be the distance from the sensor
         """
         # TODO:
-        #  Step 1 Move the particles (with moise added)
+        #  Step 1 Move the particles (with noise added)
         #  Step 2 Calculate the weights using the distance sensor return value
         #  Step 3 Resample/importance weight
 

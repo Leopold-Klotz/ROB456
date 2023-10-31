@@ -24,6 +24,7 @@ if "GUI" not in sys.path:
     os.chdir("..")
     sys.path.append(f'{os.getcwd()}/GUI')
     os.chdir(save_path)
+
 from gui_sliders import SliderFloatDisplay, SliderIntDisplay
 
 
