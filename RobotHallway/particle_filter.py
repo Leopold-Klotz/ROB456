@@ -176,22 +176,6 @@ class ParticleFilter:
         #         Note that np.where can be used to substantially speed up finding which particle
         #   Part 3: Set the weights back to uniform (just to be neat and clean)
 
-        # new_particles = np.zeros(len(self.particles))
-        # weights_sum = np.zeros(len(self.weights))
-
-        # for i in range(len(self.particles)):
-        #     weights_sum[i] = np.sum(self.weights[:i+1])
-        #     rand = np.random.uniform(0, 1)
-
-        #     # discrete sampling
-        #     for j in range(len(weights_sum)): 
-        #         if weights_sum[j] > rand: 
-        #             new_particles[i] = self.particles[j]
-        #             break
-
-        # self.particles = new_particles
-        # self.weights = np.ones(len(weights_sum)) / len(weights_sum) # make the weights uniform
-
         self.particles = np.random.choice(self.particles, size=len(self.particles), replace=True, p=self.weights)
         self.weights = np.ones(len(self.particles)) / len(self.particles) # make the weights uniform
 
