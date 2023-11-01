@@ -118,7 +118,7 @@ def test_kalman_update(b_print=True):
         print("Testing Kalman")
     # Generate some move sequences and compare to the correct answer
     import json
-    with open("/Users/leo_k/My Drive/Fall 2023/Robotics/ROB456/RobotHallway/Data/check_kalman_filter.json", "r") as f:
+    with open("Data/check_kalman_filter.json", "r") as f:
         answers = json.load(f)
 
     kalman_filter = KalmanFilter()

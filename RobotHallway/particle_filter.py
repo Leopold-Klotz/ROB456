@@ -301,7 +301,7 @@ def test_particle_filter_syntax(b_print=True):
 
     # Read in some move sequences and compare your result to the correct answer
     import json
-    with open("/Users/leo_k/My Drive/Fall 2023/Robotics/ROB456/RobotHallway/Data/check_particle_filter.json", "r") as f:
+    with open("Data/check_particle_filter.json", "r") as f:
         answers = json.load(f)
 
     if b_print:
