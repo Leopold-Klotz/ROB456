@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'ros2_stage'
@@ -10,13 +12,15 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*')), # Holds Gazebo .world and .inc files
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='wsl-ubuntu',
-    maintainer_email='wsl-ubuntu@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='klotzl',
+    maintainer_email='klotzl@oregonstate.edu',
+    description='osu_stage ported to ROS2',
+    license='GPLv3',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
