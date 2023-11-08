@@ -11,26 +11,31 @@ def generate_launch_description():
 
     package_dir = get_package_share_directory('ros2_stage')
 
-    simple_world_path = os.path.join(package_dir, 'worlds', 'simple.world')
+    world_path = os.path.join(package_dir, 'worlds', 'simple.world')
 
     ld = LaunchDescription()
 
     # Declare the launch options
     declare_simple_world_cmd = DeclareLaunchArgument(
         'simple_world',
-        default_value=simple_world_path,
+        default_value=world_path,
         description='Full path to simple.world'
     )
 
-    # Node definition for simple world launch
-    node1 = Node(
-        package='stage_ros2',
-        executable='stage_ros2',
-        name='stage_ros2',
-        arguments=['-d', LaunchConfiguration('simple_world')],
+    gazebo_backend = Node(
+        package='gazebo_ros', # This is the ROS package for Gazebo integration
+        executable='gzserver', # This is the Gazebo server executable
+        arguments=['-s', 'libgazebo_ros_factory.so', LaunchConfiguration('simple_world')],
         output='screen'
     )
 
-    ld.add_action(node1)
+    gazebo_executable = Node(
+        package='gazebo_ros',
+        executable='gzclient', # This is the Gazebo client executable
+        output='screen'
+    )
+
+    ld.add_action(gazebo_backend)
+    ld.add_action(gazebo_executable)
 
     return ld
