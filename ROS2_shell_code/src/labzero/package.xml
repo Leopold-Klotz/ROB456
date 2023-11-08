@@ -4,7 +4,7 @@
   <name>labzero</name>
   <version>0.0.0</version>
   <description>Lab 0 ported to ROS2</description>
-  <maintainer email="leopoldk3@gmail.com">lk</maintainer>
+  <maintainer email="klotzl@oregonstate.edu">lk</maintainer>
   <license>GPLv3</license>
 
   <test_depend>ament_copyright</test_depend>
