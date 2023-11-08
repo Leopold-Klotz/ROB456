@@ -7,11 +7,17 @@
 # Bill Smart, smartw@oregonstate.edu
 #
 # This example shows the basic code for publishing on topics.
+#
+# Edited 11/7/23, Leopold Klotz, Klotzl@oregonstate.edu. Transition to ROS2
 
 
 # Import ROS Python basic API and sys
-import rospy
+##ROS1 Code
+# import rospy
 import sys
+
+#ros2
+import rclpy
 
 
 # We're going to publish 64-bit integers, so we need to import this from the
@@ -24,16 +30,30 @@ from std_msgs.msg import Int64
 
 if __name__ == '__main__':
 	# Initialize the node, and call it "publisher".
-	rospy.init_node('publisher', argv=sys.argv)
+
+	##ROS1 Code
+	# rospy.init_node('publisher', argv=sys.argv)
+	#ROS2 Code
+	rclpy.init(args=sys.argv)
+	node = rclpy.create_node('publisher')
+
 
 	# Set up a publisher.  This will publish on a topic called "counter", with a
 	# message type of Int64.
-	publisher = rospy.Publisher('counter', Int64, queue_size=10)
+
+	##ROS1 Code
+	# publisher = rospy.Publisher('counter', Int64, queue_size=10)
+	#ROS2 Code
+	publisher = node.create_publisher(Int64, 'counter', 10)
+
 
 
 	# Rate allows us to control the (approximate) rate at which we publish things.
 	# For this example, we want to publish at 1Hz.
-	rate = rospy.Rate(1)
+	##ROS1 Code
+	# rate = rospy.Rate(1)
+	#ROS2 Code
+	rate = node.create_rate(1)
 
 	# Set up a counter that we're going to increment to give us some data to
 	# publish.
@@ -41,12 +61,20 @@ if __name__ == '__main__':
 
 	# This will loop until ROS shuts down the node.  This can be done on the
 	# command line with a ctrl-C, or automatically from roslaunch.
-	while not rospy.is_shutdown():
+
+	##ROS1 Code
+	# while not rospy.is_shutdown():
+	#ROS2 Code
+	while rclpy.ok():
 		# Publish the value of the counter.
 		publisher.publish(counter)
 
 		# Print out a log message to the INFO channel to let us know it's working.
-		rospy.loginfo(f'Published {counter}')
+		
+		##ROS1 Code
+		# rospy.loginfo(f'Published {counter}')
+		#ROS2 Code
+		node.get_logger().info(f'Published {counter}')
 
 		# Increment the counter.
 		counter += 1

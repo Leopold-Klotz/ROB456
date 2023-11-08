@@ -8,11 +8,18 @@
 # Bill Smart, smartw@oregonstate.edu
 #
 # This example shows the basic code for subscribing to a topic.
+#
+# Edited 11/7/23, Leopold Klotz, Klotzl@oregonstate.edu. Transition to ROS2
 
 
 # Import ROS Python basic API and sys
-import rospy
+
+##ROS1 Code
+# import rospy
 import sys
+
+#ros2
+import rclpy
 
 # We're going to subscribe to 64-bit integers, so we need to import the defintion
 # for them.
@@ -28,19 +35,37 @@ def callback(msg):
 	"""
 
 	# The value of the integer is stored in the data attribute of the message.
-	rospy.loginfo(f'Got {msg.data}')
+	
+	##ROS1 Code
+	# rospy.loginfo(f'Got {msg.data}')
+	#ROS2 Code
+	print(f'Got {msg.data}')
 
 
 if __name__ == '__main__':
 	# Initialize the node.
-	rospy.init_node('subscriber', argv=sys.argv)
+
+	##ROS1 Code
+	# rospy.init_node('subscriber', argv=sys.argv)
+	#ROS2 Code
+	rclpy.init(args=sys.argv)
+	node = rclpy.create_node('subscriber')
 
 	# Set up a subscriber.  We're going to subscribe to the topic "counter",
 	# looking for Int64 messages.  When a message comes in, ROS is going to pass
 	# it to the function "callback" automatically.
-	subscriber = rospy.Subscriber('counter', Int64, callback)
+
+	##ROS1 Code
+	# subscriber = rospy.Subscriber('counter', Int64, callback)
+	#ROS2 Code
+	subscriber = node.create_subscription(Int64, 'counter', callback, 10)
 
 	# Give control to ROS.  This will allow the callback to be called whenever new
 	# messages come in.  If we don't put this line in, then the node will not work,
 	# and ROS will not process any messages.
-	rospy.spin()
+
+	##ROS1 Code
+	# rospy.spin()
+	#ROS2 Code
+	rclpy.spin(node)
+	
