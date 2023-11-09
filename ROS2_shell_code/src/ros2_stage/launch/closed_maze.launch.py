@@ -11,7 +11,7 @@ def generate_launch_description():
 
     package_dir = get_package_share_directory('ros2_stage')
 
-    world_path = os.path.join(package_dir, 'worlds', 'simple.world')
+    world_path = os.path.join(package_dir, 'worlds', 'closed_maze.world')
 
     ld = LaunchDescription()
 
