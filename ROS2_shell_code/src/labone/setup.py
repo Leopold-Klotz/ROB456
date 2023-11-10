@@ -13,10 +13,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='wsl-ubuntu',
-    maintainer_email='wsl-ubuntu@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='klotzl',
+    maintainer_email='klotzl@oregonstate.edu',
+    description='Lab 1 ROS2 package',
+    license='GPLv3',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
