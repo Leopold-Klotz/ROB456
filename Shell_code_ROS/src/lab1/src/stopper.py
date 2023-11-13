@@ -57,7 +57,27 @@ def callback(scan):
 	t.angular.z = 0.0
 
 	shortest = 0
-# YOUR CODE HERE
+
+	# Constants for stopping behavior
+	MIN_DISTANCE = 1.0  # meters, threshold for stopping
+	MAX_SPEED = 0.22  # m/s, maximum speed of the robot (you can adjust this as needed)
+
+	# Determine which readings are "in front of" the robot (within 45 degrees of forward)
+	front_indices = np.where(np.abs(thetas) < np.pi / 4)
+
+	# Get the minimum distance to the closest object in the "front" range
+	front_ranges = np.array(scan.ranges)[front_indices]
+	shortest = np.min(front_ranges)
+
+	# Decide when to stop the robot based on the distance to the closest object
+	if shortest < MIN_DISTANCE:
+		speed = 0.0
+	else:
+		# Scale the robot's speed based on the distance to the closest object
+		distance_scale = np.tanh(shortest - MIN_DISTANCE)
+		speed = MAX_SPEED * distance_scale
+
+	t.linear.x = speed
 
 	# Send the command to the robot.
 	publisher.publish(t)
