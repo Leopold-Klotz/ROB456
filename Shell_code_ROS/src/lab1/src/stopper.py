@@ -80,6 +80,7 @@ def callback(scan):
 		speed = 1 * distance_scale # 1 m/s scaled by distance
 
 	t.linear.x = speed
+	# END MY CODE
 
 	# Send the command to the robot.
 	publisher.publish(t)
