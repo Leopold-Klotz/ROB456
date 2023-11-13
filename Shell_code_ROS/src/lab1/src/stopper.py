@@ -56,26 +56,28 @@ def callback(scan):
 	t.angular.y = 0.0
 	t.angular.z = 0.0
 
-	shortest = 0
+	# YOUR CODE HERE
+	# step 1: what is in front of the robot (19 cm )
+	ranges = np.array(scan.ranges)
+	y_values = ranges * np.sin(thetas)
+	front_indices = np.where(np.abs(y_values) < 0.19)
 
-	# Constants for stopping behavior
-	MIN_DISTANCE = 1.0  # meters, threshold for stopping
-	MAX_SPEED = 0.22  # m/s, maximum speed of the robot (you can adjust this as needed)
+	# Initially I thought that this would correspond to the front of the robot becuase it would be the fov in the front quarter
+	# will ask about this in office hours or in class
+	# front_indices = np.where(np.abs(thetas) < np.pi / 4)
 
-	# Determine which readings are "in front of" the robot (within 45 degrees of forward)
-	front_indices = np.where(np.abs(thetas) < np.pi / 4)
-
-	# Get the minimum distance to the closest object in the "front" range
+	# step 2
 	front_ranges = np.array(scan.ranges)[front_indices]
+
+	# step 3
 	shortest = np.min(front_ranges)
 
-	# Decide when to stop the robot based on the distance to the closest object
-	if shortest < MIN_DISTANCE:
+	# step 4
+	if shortest < 1: # stop if 1 m
 		speed = 0.0
-	else:
-		# Scale the robot's speed based on the distance to the closest object
-		distance_scale = np.tanh(shortest - MIN_DISTANCE)
-		speed = MAX_SPEED * distance_scale
+	else: # slow down if getting close
+		distance_scale = np.tanh(shortest - 1)
+		speed = 1 * distance_scale # 1 m/s scaled by distance
 
 	t.linear.x = speed
 
