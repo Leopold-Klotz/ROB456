@@ -15,6 +15,8 @@ from tf.transformations import euler_from_quaternion
 import actionlib
 import tf
 
+import numpy as np
+
 from lab2.msg import NavTargetAction, NavTargetResult, NavTargetFeedback
 
 
@@ -143,7 +145,38 @@ class Driver:
 		# This sets the angular turn speed (in radians per second)
 		command.angular.z = 0.1
 
-# YOUR CODE HERE
+		# My Code
+		# target is in robot coordinates, robot is at (0,0)
+		# step 1
+		angle = atan2(target[1], target[0])
+		command.angular.z = angle
+
+		# step 2
+		distance = sqrt(target[0]**2 + target[1]**2)
+		speed = 1 * tanh(distance - self.threshold)
+		command.linear.x = speed
+
+		# robot is now moving forward at speed and turning at angle
+		# step 3 avoid obstacle if it gets in the way
+		# get the values of the lidar in front of the robot. Took from lab1
+		angle_min = lidar.angle_min
+		angle_max = lidar.angle_max
+		num_readings = len(lidar.ranges)
+		thetas = np.linspace(angle_min, angle_max, num_readings)
+		ranges = np.array(lidar.ranges)
+		y_values = ranges * np.sin(thetas)
+		front_indices = np.where(np.abs(y_values) < 0.19)
+		front_ranges = np.array(lidar.ranges)[front_indices]
+
+		shortest = np.min(front_ranges)
+		avoid_dist_obstacle = 1
+		# if there is an obstacle in front of the robot, veer left
+		if shortest < avoid_dist_obstacle: # will occur if obstacle is in path. gets ignored while path is clear. continuously evaluated
+			# slow down speed as obstacle nears
+			command.linear.x = command.linear.x * (shortest / avoid_dist_obstacle) # old speed * ratio of proximity (slow down more if closer)
+			command.angular.z = command.angular.z + (1 - shortest / avoid_dist_obstacle) # old angle + ratio of proximity (turn more if closer)
+
+		# End My Code
 
 		return command
 
