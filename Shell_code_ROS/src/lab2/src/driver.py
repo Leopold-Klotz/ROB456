@@ -165,16 +165,16 @@ class Driver:
 		thetas = np.linspace(angle_min, angle_max, num_readings)
 		ranges = np.array(lidar.ranges)
 		y_values = ranges * np.sin(thetas)
-		front_indices = np.where(np.abs(y_values) < 0.19)
+		front_indices = np.where(np.abs(y_values) < 0.25) # robot is 0.19 (half), but increasing to 0.25 to add turning margin
 		front_ranges = np.array(lidar.ranges)[front_indices]
 
 		shortest = np.min(front_ranges)
-		avoid_dist_obstacle = 1
+		avoid_dist_obstacle = 2
 		# if there is an obstacle in front of the robot, veer left
 		if shortest < avoid_dist_obstacle: # will occur if obstacle is in path. gets ignored while path is clear. continuously evaluated
 			# slow down speed as obstacle nears
-			command.linear.x = command.linear.x * (shortest / avoid_dist_obstacle) # old speed * ratio of proximity (slow down more if closer)
-			command.angular.z = command.angular.z + (1 - shortest / avoid_dist_obstacle) # old angle + ratio of proximity (turn more if closer)
+			command.linear.x = 0.1 #command.linear.x * 10 * (shortest / avoid_dist_obstacle) # old speed * ratio of proximity (slow down more if closer) * constant to make change more
+			command.angular.z = command.angular.z + 2 * (1 - shortest / avoid_dist_obstacle) # old angle + ratio of proximity (turn more if closer) * constant to make change more
 
 		# End My Code
 
