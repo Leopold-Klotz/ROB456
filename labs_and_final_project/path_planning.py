@@ -181,14 +181,16 @@ def dijkstra(im, robot_loc, goal_loc):
         # Get the current best node off of the list
         current_node = heapq.heappop(priority_queue)
         # Pop returns the value and the i, j
-        node_score = current_node[0]
+        node_score = current_node[0] 
         node_ij = current_node[1]
 
+        print("node ij: ", node_ij)
+
         # Showing how to get this data back out of visited
-        visited_triplet = visited[node_ij]
-        visited_distance = visited_triplet[0]
-        visited_parent = visited_triplet[1]
-        visited_closed_yn = visited_triplet[2]
+        # visited_triplet = visited[node_ij]
+        # visited_distance = visited_triplet[0] 
+        # visited_parent = visited_triplet[1]
+        # visited_closed_yn = visited_triplet[2]
 
         # TODO
         #  Step 1: Break out of the loop if node_ij is the goal node
@@ -198,6 +200,20 @@ def dijkstra(im, robot_loc, goal_loc):
         #  Lec 8_1: Planning, at the end
         #  https://docs.google.com/presentation/d/1pt8AcSKS2TbKpTAVV190pRHgS_M38ldtHQHIltcYH6Y/edit#slide=id.g18d0c3a1e7d_0_0
 # YOUR CODE HERE
+        if node_ij == goal_loc: # if goal node
+            break
+        if visited[node_ij][2]: # if closed skip
+            continue
+        visited[node_ij] = (node_score, visited[node_ij][1], True) # closed
+        for neighbor in eight_connected(node_ij):
+            if not is_free(im, neighbor): # wall can't drive there
+                continue
+            if neighbor in visited: # already went there 
+                continue
+            # if value + edge < neighbor value then update
+            if node_score + 1 < visited[neighbor][0]: ########## THis is where the error is
+                visited[neighbor] = (node_score + 1, node_ij, False) 
+                heapq.heappush(priority_queue, (node_score + 1, neighbor)) # push the neighbor to the queue
 
     # Now check that we actually found the goal node
     try_2 = goal_loc
