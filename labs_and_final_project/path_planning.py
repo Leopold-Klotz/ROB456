@@ -176,6 +176,14 @@ def dijkstra(im, robot_loc, goal_loc):
     #   Store the best distance, the parent, and if closed y/n
     visited[robot_loc] = (0, None, False)   # For every other node this will be the current_node, distance
 
+    ## Debuging prints
+    # print("priority queue: ", priority_queue)
+    # print("visited: ", visited)
+    # print("goal loc: ", goal_loc)
+    # print("robot loc: ", robot_loc)
+    # print("im: ", im.shape)
+    # print("\n\n")
+
     # While the list is not empty - use a break for if the node is the end node
     while priority_queue:
         # Get the current best node off of the list
@@ -184,7 +192,7 @@ def dijkstra(im, robot_loc, goal_loc):
         node_score = current_node[0] 
         node_ij = current_node[1]
 
-        print("node ij: ", node_ij)
+        # print("node ij: ", node_ij)
 
         # Showing how to get this data back out of visited
         # visited_triplet = visited[node_ij]
@@ -199,21 +207,31 @@ def dijkstra(im, robot_loc, goal_loc):
         #    Now do the instructions from the slide (the actual algorithm)
         #  Lec 8_1: Planning, at the end
         #  https://docs.google.com/presentation/d/1pt8AcSKS2TbKpTAVV190pRHgS_M38ldtHQHIltcYH6Y/edit#slide=id.g18d0c3a1e7d_0_0
-# YOUR CODE HERE
+        
+        # YOUR CODE HERE
+
         if node_ij == goal_loc: # if goal node
             break
-        if visited[node_ij][2]: # if closed skip
+
+        if visited[node_ij][2]: # if closed, skip  
             continue
+
         visited[node_ij] = (node_score, visited[node_ij][1], True) # closed
+        # print("visited: ", visited)
+
         for neighbor in eight_connected(node_ij):
             if not is_free(im, neighbor): # wall can't drive there
                 continue
-            if neighbor in visited: # already went there 
-                continue
-            # if value + edge < neighbor value then update
-            if node_score + 1 < visited[neighbor][0]: ########## THis is where the error is
-                visited[neighbor] = (node_score + 1, node_ij, False) 
-                heapq.heappush(priority_queue, (node_score + 1, neighbor)) # push the neighbor to the queue
+
+            # update the neighbor's score and add it to the priority queue 
+            neighbor_score = node_score + 1
+            # Check if the neighbor is not closed or if the new score is better
+            if (neighbor not in visited) or (visited[neighbor][2] == False and neighbor_score < visited[neighbor][0]):
+                visited[neighbor] = (neighbor_score, node_ij, False)
+                heapq.heappush(priority_queue, (neighbor_score, neighbor))
+
+    ### while loop should have done: start at robot_loc, explore open neighbors finding the shortest path to goal_loc
+    ### End of while loop
 
     # Now check that we actually found the goal node
     try_2 = goal_loc
@@ -232,7 +250,11 @@ def dijkstra(im, robot_loc, goal_loc):
     path = []
     path.append(goal_loc)
     # TODO: Build the path by starting at the goal node and working backwards
-# YOUR CODE HERE
+    # YOUR CODE HERE
+    current_node = visited[goal_loc]
+    while current_node[1] != None:
+        path.append(current_node[1])
+        current_node = visited[current_node[1]] # traverse backwards using parent node
 
     return path
 
