@@ -110,6 +110,9 @@ def is_reachable(im, pix):
     #  False otherwise
     # You can use four or eight connected - eight will return more points
 # YOUR CODE HERE
+    for pixel in path_planning.eight_connected(im, pix): # iterate through 8 connected pixels
+        if path_planning.is_free(im, pixel): # if one of the pixels is free, return true
+            return True
     return False
 
 
@@ -121,6 +124,14 @@ def find_all_possible_goals(im):
     @return dictionary or list or binary image of possible pixels"""
 
 # YOUR CODE HERE
+    for i in range(im.shape[0]):
+        for j in range(im.shape[1]): # iterate through all pixels
+            if im[i][j] == 0: # if the pixel is unseen
+                for pixel in path_planning.eight_connected(im, convert_x_y_to_pix(im.shape, (i,j), 0.05)): # the convert function may just need to be (i,j) i'm getting confused on the relation
+                    if path_planning.is_free(im, pixel):
+                        return pixel
+                    
+    return None
 
 
 def find_best_point(im, possible_points, robot_loc):
@@ -130,6 +141,12 @@ def find_best_point(im, possible_points, robot_loc):
     @param robot_loc - location of the robot (in case you want to factor that in)
     """
 # YOUR CODE HERE
+    # sort the possible points by distance from robot
+    # return the middle point
+    sorted
+
+    for point in possible_points:
+        heapq.heappush(possible_points, (path_planning.distance(point, robot_loc), point))
 
 
 def find_waypoints(im, path):
