@@ -186,8 +186,16 @@ def find_waypoints(im, path):
         x2, y2 = path[i]
         x3, y3 = path[i+1]
         
-        s1 = (y2-y1)/(x2-x1) # previous slope
-        s2 = (y3-y2)/(x3-x2) # next slope
+        if x2 - x1 != 0:  
+            s1 = (y2-y1)/(x2-x1) # previous slope
+        else: # can't /0
+            s1 = float('inf') if y2 - y1 > 0 else float('-inf')
+
+        if x3 - x2 != 0:  
+            s2 = (y3-y2)/(x3-x2) # next slope
+        else: # can't /0
+            s2 = float('inf') if y3 - y2 > 0 else float('-inf')
+
         if s1 != s2:
             new_path.append(path[i]) # waypoint at slope change
     new_path.append(path[-1]) # final destination
